@@ -6,7 +6,8 @@ android-targetSdk = "36"
 androidx-activity = "1.12.0"
 androidx-appcompat = "1.7.1"
 androidx-core = "1.17.0"
-androidx-lifecycle = "2.9.6"
+androidx-lifecycle = "2.6.1"
+coilCompose = "2.4.0"
 composeHotReload = "1.0.0"
 composeMultiplatform = "1.9.3"
 kotlin = "2.2.21"
@@ -15,8 +16,14 @@ ktor = "3.0.2"
 koin = "3.4.2"
 serialization = "1.7.3"
 junit = "4.13.2"
+navigationCompose = "2.8.0"
+materialIcons = "1.7.5"
 
 [libraries]
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core",version.ref = "materialIcons" }
+androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIcons" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
@@ -36,6 +43,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 # Koin dependencies
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

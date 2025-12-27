@@ -21,11 +21,16 @@ kotlin {
             dependencies {
                 implementation(compose.preview)
                 implementation(libs.androidx.activity.compose)
+                implementation(libs.androidx.navigation.compose)
+                implementation(libs.androidx.compose.material.icons.core)
+                implementation(libs.androidx.compose.material.icons.extended)
 
                 // Ktor Android engine + Koin Android
                 implementation(libs.ktor.client.okhttp)
                 implementation(libs.koin.android)
-                implementation("io.coil-kt:coil-compose:2.4.0")
+                implementation(libs.coil.compose)
+                implementation(libs.koin.androidx.compose)
+
             }
         }
         val commonMain by getting {

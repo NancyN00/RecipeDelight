@@ -1,6 +1,8 @@
-package com.nancy.recipedelight.ui
+package com.nancy.recipedelight.ui.home
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nancy.recipedelight.domain.models.Category

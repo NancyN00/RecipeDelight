@@ -17,12 +17,18 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.nancy.recipedelight.domain.models.Category
 import com.nancy.recipedelight.domain.models.Meal
-import com.nancy.recipedelight.ui.HomeViewModel
+import androidx.compose.foundation.lazy.grid.items
+import org.koin.androidx.compose.koinViewModel
+
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel) {
-    val randomMeal by viewModel.randomMeal.collectAsState(initial = null)
-    val categories by viewModel.categories.collectAsState(initial = emptyList())
+fun HomeScreen(
+    viewModel: HomeViewModel = koinViewModel(),
+    onCategoryClick: (String) -> Unit
+) {
+
+    val randomMeal = viewModel.randomMeal
+    val categories = viewModel.categories
 
     Column(
         modifier = Modifier
@@ -53,7 +59,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
         ) {
             items(categories) { category ->
                 CategoryItem(category) {
-                    // TODO: fetch meals by category
+                    onCategoryClick(category.name)
                 }
             }
         }
