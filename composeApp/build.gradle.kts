@@ -7,6 +7,15 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.sqldelight)
+}
+
+sqldelight {
+    databases {
+        create("RecipeDatabase") {
+            packageName.set("com.nancy.recipedelight.data.local")
+        }
+    }
 }
 
 kotlin {
@@ -30,6 +39,8 @@ kotlin {
                 implementation(libs.koin.android)
                 implementation(libs.coil.compose)
                 implementation(libs.koin.androidx.compose)
+
+                implementation(libs.sqldelight.android.driver)
 
             }
         }
@@ -56,6 +67,11 @@ kotlin {
 
                 // Koin
                 implementation(libs.koin.core)
+
+                //SqlDelight
+                implementation(libs.sqldelight.coroutines)
+
+
             }
         }
         val commonTest by getting {
