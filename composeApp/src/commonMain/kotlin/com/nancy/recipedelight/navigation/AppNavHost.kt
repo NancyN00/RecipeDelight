@@ -37,9 +37,6 @@ fun AppNavHost(
                 onCategoryClick = { categoryName ->
                     navController.navigate(Screen.CategoryMeals.createRoute(categoryName))
                 },
-//                onMealClick = { mealId ->
-//                    navController.navigate(Screen.MealDetails.createRoute(mealId))
-//                }
             )
         }
 
