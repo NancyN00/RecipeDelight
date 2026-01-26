@@ -1,0 +1,27 @@
+import androidx.compose.ui.text.AnnotationType.String;
+import kotlin.collections.List;
+
+CREATE TABLE BookmarkEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    category TEXT,
+    area TEXT,
+    instructions TEXT,
+    thumb TEXT,
+    tags TEXT AS List<String>,
+    youtube TEXT,
+    ingredients TEXT AS List<String>
+);
+
+insertBookmark:
+INSERT OR REPLACE INTO BookmarkEntity(id, name, category, area, instructions, thumb, tags, youtube, ingredients)
+VALUES ?;
+
+deleteBookmark:
+DELETE FROM BookmarkEntity WHERE id = ?;
+
+selectAllBookmarks:
+SELECT * FROM BookmarkEntity;
+
+selectBookmarkById:
+SELECT * FROM BookmarkEntity WHERE id = ?;

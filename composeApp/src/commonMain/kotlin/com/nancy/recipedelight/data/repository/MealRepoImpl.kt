@@ -28,6 +28,27 @@ class MealRepoImpl(private val client: HttpClient) : MealRepository {
         val mealDto = response.meals?.firstOrNull()
         return mealDto?.toDomain() ?: throw IllegalStateException("Meal not found for ID: $mealId")
     }
+
+    suspend fun toggleBookmark(meal: Meal) {
+        val isBookmarked = queries.selectBookmarkById(meal.id).executeAsOneOrNull() != null
+        if (isBookmarked) {
+            queries.deleteBookmark(meal.id)
+        } else {
+            queries.insertBookmark(
+                BookmarkEntity(
+                    id = meal.id,
+                    name = meal.name,
+                    category = meal.category,
+                    area = meal.area,
+                    instructions = meal.instructions,
+                    thumb = meal.thumb,
+                    tags = meal.tags,
+                    youtube = meal.youtube,
+                    ingredients = meal.ingredients
+                )
+            )
+        }
+    }
 }
 
 /** --- DTO to Domain mapping --- */

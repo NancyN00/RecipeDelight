@@ -18,7 +18,7 @@ serialization = "1.7.3"
 junit = "4.13.2"
 navigationCompose = "2.8.0"
 materialIcons = "1.7.5"
-sqldelight = "2.0.2"
+sqldelight = "2.2.1"
 
 [libraries]
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
@@ -49,6 +49,8 @@ koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", versi
 #SqlDelight
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
