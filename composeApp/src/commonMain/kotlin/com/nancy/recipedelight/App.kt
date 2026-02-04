@@ -1,3 +1,5 @@
+package com.nancy.recipedelight
+
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.nancy.recipedelight.navigation.MainScreen

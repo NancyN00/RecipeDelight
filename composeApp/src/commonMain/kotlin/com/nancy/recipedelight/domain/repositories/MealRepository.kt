@@ -3,6 +3,7 @@ package com.nancy.recipedelight.domain.repositories
 import com.nancy.recipedelight.domain.models.Category
 import com.nancy.recipedelight.domain.models.Meal
 import com.nancy.recipedelight.domain.models.MealSummary
+import kotlinx.coroutines.flow.Flow
 
 interface MealRepository {
 
@@ -13,4 +14,14 @@ interface MealRepository {
     suspend fun getMealsByCategory(categoryName: String): List<MealSummary>
 
     suspend fun getMealDetails(mealId: String): Meal
+
+    // Database operations
+    //Get the stream of all favorites for the Home/Favorites screen
+    fun getBookmarkedMeals(): Flow<List<Meal>>
+
+    //Observe the status of a specific meal for the Details screen
+    fun isMealBookmarked(id: String): Flow<Boolean>
+
+    //The action to add or remove
+    suspend fun toggleBookmark(meal: Meal)
 }

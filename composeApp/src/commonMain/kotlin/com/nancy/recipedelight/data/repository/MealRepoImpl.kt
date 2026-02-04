@@ -1,11 +1,24 @@
 package com.nancy.recipedelight.data.repository
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOne
+import com.nancy.recipedelight.data.local.BookmarkEntity
+import com.nancy.recipedelight.data.local.MealQueries
 import com.nancy.recipedelight.data.remote.*
 import com.nancy.recipedelight.domain.models.*
 import com.nancy.recipedelight.domain.repositories.MealRepository
 import io.ktor.client.HttpClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-class MealRepoImpl(private val client: HttpClient) : MealRepository {
+class MealRepoImpl(
+    private val client: HttpClient,
+    private val queries: MealQueries
+) : MealRepository {
+
+    //API IMPLEMENTATION
 
     override suspend fun getRandomMeal(): Meal {
         val response = MealApi.getRandomMeal(client)
@@ -29,9 +42,30 @@ class MealRepoImpl(private val client: HttpClient) : MealRepository {
         return mealDto?.toDomain() ?: throw IllegalStateException("Meal not found for ID: $mealId")
     }
 
-    suspend fun toggleBookmark(meal: Meal) {
-        val isBookmarked = queries.selectBookmarkById(meal.id).executeAsOneOrNull() != null
-        if (isBookmarked) {
+    //DATABASE IMPLEMENTATION
+
+    override fun getBookmarkedMeals(): Flow<List<Meal>> {
+        return queries.selectAllBookmarks()
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { entities ->
+                entities.map { it.toDomain() }
+            }
+    }
+
+    override fun isMealBookmarked(id: String): Flow<Boolean> {
+        return queries.isBookmarked(id)
+            .asFlow()
+            .mapToOne(Dispatchers.Default)
+            .map { count -> count > 0 }
+    }
+
+
+    override suspend fun toggleBookmark(meal: Meal) {
+        // Check if it exists using the count query
+        val exists = queries.isBookmarked(meal.id).executeAsOne() > 0
+
+        if (exists) {
             queries.deleteBookmark(meal.id)
         } else {
             queries.insertBookmark(
@@ -51,7 +85,23 @@ class MealRepoImpl(private val client: HttpClient) : MealRepository {
     }
 }
 
-/** --- DTO to Domain mapping --- */
+//Domain mapping for the Database
+fun BookmarkEntity.toDomain(): Meal {
+    return Meal(
+        id = id,
+        name = name,
+        category = category,
+        area = area,
+        instructions = instructions,
+        thumb = thumb,
+        tags = tags ?: emptyList(),
+        youtube = youtube,
+        ingredients = ingredients ?: emptyList()
+    )
+}
+
+/** --- DTO to Domain mapping
+ * this toDomain() extension functions are for Network DTOs--- */
 
 private fun MealDto.toDomain(): Meal {
     val ingredients = listOfNotNull(

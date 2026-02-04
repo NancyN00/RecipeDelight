@@ -18,6 +18,7 @@ class HomeViewModel(private val repository: MealRepository) : ViewModel() {
     var randomMeal by mutableStateOf<Meal?>(null)
         private set
 
+
     init {
         viewModelScope.launch {
             fetchCategories()
@@ -32,4 +33,6 @@ class HomeViewModel(private val repository: MealRepository) : ViewModel() {
     private suspend fun fetchRandomMeal() {
         randomMeal = repository.getRandomMeal()
     }
+
+
 }
