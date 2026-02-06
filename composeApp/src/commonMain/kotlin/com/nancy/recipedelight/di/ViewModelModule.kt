@@ -1,7 +1,7 @@
 package com.nancy.recipedelight.di
 
 
-import com.nancy.recipedelight.ui.home.HomeViewModel
+import com.nancy.recipedelight.ui.HomeViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 

@@ -11,7 +11,7 @@ class RecipeDelightApp : Application() {
         super.onCreate()
         startKoin {
             androidContext(this@RecipeDelightApp)
-            modules(appModule, viewModelModule)
+            modules(appModule, viewModelModule, androidModule)
         }
     }
 }

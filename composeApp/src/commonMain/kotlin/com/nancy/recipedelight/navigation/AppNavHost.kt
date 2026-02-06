@@ -8,12 +8,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nancy.recipedelight.domain.repositories.MealRepository
-import com.nancy.recipedelight.ui.bookmark.BookMarksScreen
 import com.nancy.recipedelight.ui.home.HomeScreen
-import com.nancy.recipedelight.ui.home.HomeViewModel
+import com.nancy.recipedelight.ui.HomeViewModel
+import com.nancy.recipedelight.ui.bookmark.BookmarkScreen
 import com.nancy.recipedelight.ui.home.categories.CategoryScreen
 import com.nancy.recipedelight.ui.home.details.MealDetailsScreen
-import com.nancy.recipedelight.ui.profile.ProfileScreen
 import org.koin.androidx.compose.get
 import org.koin.androidx.compose.koinViewModel
 
@@ -31,9 +30,9 @@ fun AppNavHost(
     ) {
         // Home screen
         composable(Screen.Home.route) {
-            val homeViewModel: HomeViewModel = koinViewModel()
+          //  val homeViewModel: HomeViewModel = koinViewModel()
             HomeScreen(
-                viewModel = homeViewModel,
+           //     viewModel = homeViewModel,
                 onCategoryClick = { categoryName ->
                     navController.navigate(Screen.CategoryMeals.createRoute(categoryName))
                 },
@@ -42,12 +41,10 @@ fun AppNavHost(
 
         // Bookmarks screen
         composable(Screen.Bookmarks.route) {
-            BookMarksScreen()
-        }
-
-        // Account/Profile screen
-        composable(Screen.Account.route) {
-            ProfileScreen()
+            BookmarkScreen(
+                onMealClick = { id ->
+                    navController.navigate("details/$id")
+                })
         }
 
         // Category screen
@@ -75,9 +72,6 @@ fun AppNavHost(
                 mealId = mealId,
                 repository = repository,
                 onBack = { navController.popBackStack() },
-                onBookmarkClick = { meal ->
-                    // TODO: implement add/remove from favorite
-                }
             )
         }
     }

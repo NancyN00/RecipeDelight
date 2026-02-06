@@ -5,7 +5,6 @@ sealed class Screen(val route: String) {
     // Bottom bar
     object Home : Screen("home")
     object Bookmarks : Screen("bookmarks")
-    object Account : Screen("account")
 
     // Category screen
     object CategoryMeals : Screen("category/{categoryName}") {

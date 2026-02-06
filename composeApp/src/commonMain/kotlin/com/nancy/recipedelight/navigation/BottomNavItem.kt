@@ -15,5 +15,4 @@ data class BottomNavItem(
 val bottomNavItems = listOf(
     BottomNavItem(Screen.Home, Icons.Default.Home, "Home"),
     BottomNavItem(Screen.Bookmarks, Icons.Default.Favorite, "Bookmarks"),
-    BottomNavItem(Screen.Account, Icons.Default.Person, "Account")
 )

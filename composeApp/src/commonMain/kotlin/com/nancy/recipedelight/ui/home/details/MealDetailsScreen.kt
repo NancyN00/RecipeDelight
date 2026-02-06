@@ -1,6 +1,5 @@
 package com.nancy.recipedelight.ui.home.details
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -18,19 +17,20 @@ import coil.compose.rememberAsyncImagePainter
 import com.nancy.recipedelight.domain.models.Meal
 import com.nancy.recipedelight.domain.repositories.MealRepository
 import kotlinx.coroutines.launch
-
+import androidx.compose.ui.graphics.Color
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MealDetailsScreen(
     mealId: String,
     repository: MealRepository,
-    onBack: () -> Unit,
-    isBookmarked: Boolean = false,
-    onBookmarkClick: (Meal) -> Unit
+    onBack: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var meal by remember { mutableStateOf<Meal?>(null) }
-    var bookmarked by remember { mutableStateOf(isBookmarked) }
+
+    //Observe the bookmark status DIRECTLY from the database Flow
+    val isBookmarked by repository.isMealBookmarked(mealId)
+        .collectAsState(initial = false)
 
     LaunchedEffect(mealId) {
         meal = repository.getMealDetails(mealId)
@@ -39,21 +39,25 @@ fun MealDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = meal?.name ?: "Meal Details") },
+                title = { Text(text = meal?.name ?: "Loading...") },
                 navigationIcon = {
-                    IconButton(onClick = { onBack() }) {
+                    IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
-                    meal?.let {
+                    meal?.let { currentMeal ->
                         IconButton(onClick = {
-                            bookmarked = !bookmarked
-                            onBookmarkClick(it)
+                            scope.launch {
+                                // 'isBookmarked' state above will update automatically!
+                                repository.toggleBookmark(currentMeal)
+                            }
                         }) {
                             Icon(
-                                imageVector = if (bookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                                contentDescription = "Bookmark"
+                                imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                                contentDescription = "Bookmark",
+                                // Use PascalCase: Transparent and Green
+                                tint = if (isBookmarked) Color.Transparent else Color.Green
                             )
                         }
                     }

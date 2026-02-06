@@ -18,6 +18,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.nancy.recipedelight.domain.models.Category
 import com.nancy.recipedelight.domain.models.Meal
 import androidx.compose.foundation.lazy.grid.items
+import com.nancy.recipedelight.ui.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
 
