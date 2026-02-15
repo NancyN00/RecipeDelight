@@ -1,6 +1,7 @@
 package com.nancy.recipedelight.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -15,4 +16,5 @@ data class BottomNavItem(
 val bottomNavItems = listOf(
     BottomNavItem(Screen.Home, Icons.Default.Home, "Home"),
     BottomNavItem(Screen.Bookmarks, Icons.Default.Favorite, "Bookmarks"),
+    BottomNavItem(Screen.ChefAI, Icons.Default.AutoAwesome, "ChefAI"),
 )

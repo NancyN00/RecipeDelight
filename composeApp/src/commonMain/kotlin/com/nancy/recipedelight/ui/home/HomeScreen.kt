@@ -18,6 +18,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.nancy.recipedelight.domain.models.Category
 import com.nancy.recipedelight.domain.models.Meal
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.ui.graphics.Color
 import com.nancy.recipedelight.ui.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -36,6 +37,16 @@ fun HomeScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
+
+        Text(
+            text = "Recipe Delight",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp),
+            color = Color.Blue
+        )
+
+
         // Random Meal Card
         randomMeal?.let { meal ->
             RandomMealCard(meal) {

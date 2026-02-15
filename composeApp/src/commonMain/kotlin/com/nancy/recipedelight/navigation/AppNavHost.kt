@@ -2,37 +2,50 @@ package com.nancy.recipedelight.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nancy.recipedelight.domain.repositories.MealRepository
+import com.nancy.recipedelight.ui.ChefAiScreen
 import com.nancy.recipedelight.ui.home.HomeScreen
 import com.nancy.recipedelight.ui.HomeViewModel
 import com.nancy.recipedelight.ui.bookmark.BookmarkScreen
 import com.nancy.recipedelight.ui.home.categories.CategoryScreen
 import com.nancy.recipedelight.ui.home.details.MealDetailsScreen
+import com.nancy.recipedelight.ui.splash.SplashScreen
 import org.koin.androidx.compose.get
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AppNavHost(
+    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    val navController = rememberNavController()
     val repository: MealRepository = get()
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route,
+        startDestination = Screen.Splash.route,
         modifier = modifier
     ) {
+
+        // Splash Screen
+        composable(Screen.Splash.route) {
+            SplashScreen(onNavigateToHome = {
+                navController.navigate(Screen.Home.route) {
+                    // Remove splash from backstack so back button doesn't go back to it
+                    popUpTo(Screen.Splash.route) { inclusive = true }
+                }
+            })
+        }
+
+
         // Home screen
         composable(Screen.Home.route) {
-          //  val homeViewModel: HomeViewModel = koinViewModel()
             HomeScreen(
-           //     viewModel = homeViewModel,
                 onCategoryClick = { categoryName ->
                     navController.navigate(Screen.CategoryMeals.createRoute(categoryName))
                 },
@@ -43,7 +56,8 @@ fun AppNavHost(
         composable(Screen.Bookmarks.route) {
             BookmarkScreen(
                 onMealClick = { id ->
-                    navController.navigate("details/$id")
+                    // Use the helper from the Screen class to ensure the string is perfect
+                    navController.navigate(Screen.MealDetails.createRoute(id))
                 })
         }
 
@@ -64,7 +78,7 @@ fun AppNavHost(
 
         // Meal details screen
         composable(
-            Screen.MealDetails.route,
+            route = Screen.MealDetails.route,
             arguments = listOf(navArgument("mealId") { type = NavType.StringType })
         ) { backStackEntry ->
             val mealId = backStackEntry.arguments?.getString("mealId") ?: ""
@@ -74,5 +88,10 @@ fun AppNavHost(
                 onBack = { navController.popBackStack() },
             )
         }
+
+        composable(Screen.ChefAI.route) {
+            ChefAiScreen()
+        }
+
     }
 }

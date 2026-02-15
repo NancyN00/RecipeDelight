@@ -14,7 +14,8 @@ fun MainScreen() {
         bottomBar = { BottomBar(navController) }
     ) { padding ->
         AppNavHost(
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(padding),
+            navController  = navController
         )
     }
 }

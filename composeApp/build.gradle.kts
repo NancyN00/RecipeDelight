@@ -40,7 +40,11 @@ kotlin {
                 implementation(libs.coil.compose)
                 implementation(libs.koin.androidx.compose)
 
+                //sqldelight
                 implementation(libs.sqldelight.android.driver)
+
+                //splash
+                implementation(libs.androidx.core.splashscreen)
 
             }
         }
