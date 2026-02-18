@@ -1,12 +1,9 @@
 package com.nancy.recipedelight.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nancy.recipedelight.BuildConfig
 import com.nancy.recipedelight.domain.repositories.GeminiRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.nancy.recipedelight.ui.chefai.ChatMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -16,18 +13,29 @@ import kotlinx.coroutines.launch
  * Calls repository.generateText when the user wants content.  */
 class GeminiViewModel(private val repository: GeminiRepository) : ViewModel() {
 
-    private val _result = MutableStateFlow("")
-    val result: StateFlow<String> = _result
+    private val _chatHistory = MutableStateFlow<List<ChatMessage>>(emptyList())
+    val chatHistory: StateFlow<List<ChatMessage>> = _chatHistory
 
-    fun generate(prompt: String) {
-        // viewModelScope to handle lifecycle automatically
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    fun sendMessage(userInput: String) {
+        if (userInput.isBlank()) return
+
+        val userMessage = ChatMessage(role = "user", text = userInput)
+        _chatHistory.value = _chatHistory.value + userMessage
+
+        _isLoading.value = true // Start thinking...
+
         viewModelScope.launch {
             try {
-                _result.value = "Thinking..."
-                val response = repository.generateText(prompt)
-                _result.value = response
+                val response = repository.generateText(_chatHistory.value)
+                val modelMessage = ChatMessage(role = "model", text = response)
+                _chatHistory.value = _chatHistory.value + modelMessage
             } catch (e: Exception) {
-                _result.value = "Error: ${e.localizedMessage}"
+                _chatHistory.value = _chatHistory.value + ChatMessage(role = "model", text = "Error: ${e.localizedMessage}")
+            } finally {
+                _isLoading.value = false // Stop thinking
             }
         }
     }

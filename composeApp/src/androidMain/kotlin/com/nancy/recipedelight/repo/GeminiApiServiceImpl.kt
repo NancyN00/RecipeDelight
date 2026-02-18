@@ -3,6 +3,7 @@ package com.nancy.recipedelight.repo
 import com.nancy.recipedelight.BuildConfig
 import java.util.concurrent.TimeUnit
 import com.nancy.recipedelight.data.remote.GeminiApiService
+import com.nancy.recipedelight.ui.chefai.ChatMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -18,25 +19,22 @@ import org.json.JSONObject
 
 class GeminiApiServiceImpl(private val apiKey: String) : GeminiApiService {
 
-    /* Increase timeouts to handle long AI generations */
     private val client = OkHttpClient.Builder()
-        .connectTimeout(30, TimeUnit.SECONDS) // Time to establish connection
-        .readTimeout(60, TimeUnit.SECONDS)    // Time to wait for the recipe text
-        .writeTimeout(30, TimeUnit.SECONDS)   // Time to send the prompt
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    override suspend fun generateContent(prompt: String): String {
+    // Updated to take a List of messages for chat style
+    override suspend fun generateContent(history: List<ChatMessage>): String {
         if (apiKey.isBlank() || apiKey == "null") {
-            return "Error: API Key is missing from local.properties"
+            return "Error: API Key is missing."
         }
-
-     //   val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey"
 
         val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey"
 
-        // Correct JSON for Gemini API
         val json = JSONObject().apply {
-            /* System Instruction */
+            /* System Instruction: AI handles the "cooking only" rule */
             put("system_instruction", JSONObject().apply {
                 put("parts", JSONArray().apply {
                     put(JSONObject().apply {
@@ -45,15 +43,18 @@ class GeminiApiServiceImpl(private val apiKey: String) : GeminiApiService {
                 })
             })
 
-            /* Add User Content */
+            /* Build the conversation history */
             put("contents", JSONArray().apply {
-                put(JSONObject().apply {
-                    put("parts", JSONArray().apply {
-                        put(JSONObject().apply {
-                            put("text", prompt)
+                history.forEach { message ->
+                    put(JSONObject().apply {
+                        put("role", message.role) // "user" or "model"
+                        put("parts", JSONArray().apply {
+                            put(JSONObject().apply {
+                                put("text", message.text)
+                            })
                         })
                     })
-                })
+                }
             })
         }
 
@@ -64,9 +65,7 @@ class GeminiApiServiceImpl(private val apiKey: String) : GeminiApiService {
             try {
                 client.newCall(request).execute().use { response ->
                     val responseBody = response.body?.string() ?: ""
-                    if (!response.isSuccessful) {
-                        return@withContext "Error ${response.code}: $responseBody"
-                    }
+                    if (!response.isSuccessful) return@withContext "Error ${response.code}"
 
                     val jsonResponse = JSONObject(responseBody)
                     jsonResponse.getJSONArray("candidates")
