@@ -3,7 +3,6 @@ package com.nancy.recipedelight.repo
 import com.nancy.recipedelight.BuildConfig
 import java.util.concurrent.TimeUnit
 import com.nancy.recipedelight.data.remote.GeminiApiService
-import com.nancy.recipedelight.ui.chefai.ChatMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType

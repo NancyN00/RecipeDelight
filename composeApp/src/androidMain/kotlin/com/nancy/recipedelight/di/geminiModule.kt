@@ -12,7 +12,7 @@ val geminiModule = module {
     // Android-only API service (needs BuildConfig)
     single<GeminiApiService> { GeminiApiServiceImpl(BuildConfig.GEMINI_API_KEY) }
 
-    single { GeminiRepository(get()) }
+    single { GeminiRepository(get(), get()) }
 
     viewModel { GeminiViewModel(get()) }
 }

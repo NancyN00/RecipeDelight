@@ -3,7 +3,10 @@ package com.nancy.recipedelight.ui.home.details
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -24,7 +27,11 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.nancy.recipedelight.domain.models.Meal
 import com.nancy.recipedelight.domain.repositories.MealRepository
+import com.nancy.recipedelight.ui.chefai.ChatBubble
+import com.nancy.recipedelight.ui.chefai.ThinkingBubble
+import com.nancy.recipedelight.ui.viewmodel.GeminiViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -170,15 +177,18 @@ fun MealDetailsScreen(
 }
 
 @Composable
-fun ChefAiChatContent(mealContext: String?) {
+fun ChefAiChatContent(
+    mealContext: String?,
+    viewModel: GeminiViewModel = koinViewModel()
+) {
     var userInput by remember { mutableStateOf("") }
-    // A simple list to store the conversation: Pair(Message, IsUser)
-    val chatMessages = remember { mutableStateListOf<Pair<String, Boolean>>() }
+    val chatHistory by viewModel.chatHistory.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.7f)
+            .fillMaxHeight(0.8f)
             .padding(16.dp)
     ) {
         Text(
@@ -187,19 +197,26 @@ fun ChefAiChatContent(mealContext: String?) {
             color = Color.Blue,
             fontWeight = FontWeight.Bold
         )
-
         Text(
-            text = "Ask me anything about this recipe!",
+            text = "Ask me anything about ${mealContext?.split(".")?.firstOrNull() ?: "this recipe"}!",
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        Divider()
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-        // Placeholder for Chat List
-        Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-            chatMessages.forEach { message ->
-                ChatBubble(text = message.first, isUser = message.second)
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(chatHistory) { message ->
+                ChatBubble(message)
+            }
+
+            if (isLoading) {
+                item { ThinkingBubble() }
             }
         }
 
@@ -208,26 +225,35 @@ fun ChefAiChatContent(mealContext: String?) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
         ) {
-            TextField(
+            OutlinedTextField(
                 value = userInput,
                 onValueChange = { userInput = it },
                 modifier = Modifier.weight(1f),
                 placeholder = { Text("How do I cook this?") },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFF0F0F0),
-                    unfocusedContainerColor = Color(0xFFF0F0F0)
-                ),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(24.dp),
+                enabled = !isLoading
             )
 
-            IconButton(onClick = {
-                if (userInput.isNotBlank()) {
-                    chatMessages.add(userInput to true)
-                    userInput = ""
-                    // AI Response logic here
-                }
-            }) {
-                Icon(Icons.Default.Send, contentDescription = "Send", tint = Color.Blue)
+            Spacer(modifier = Modifier.width(8.dp))
+            Button(
+                onClick = {
+                    if (userInput.isNotBlank()) {
+                        // Simply pass the input and the mealContext.
+                        // The ViewModel will handle the "Context: I am looking at..." part.
+                        viewModel.sendMessage(userInput, mealContext)
+                        userInput = ""
+                    }
+                },
+                modifier = Modifier.wrapContentSize(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
+                shape = CircleShape,
+                enabled = !isLoading
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Send,
+                    contentDescription = "Send message about $mealContext",
+                    tint = Color.White
+                )
             }
         }
     }
