@@ -1,4 +1,4 @@
-package com.nancy.recipedelight.ui
+package com.nancy.recipedelight.ui.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

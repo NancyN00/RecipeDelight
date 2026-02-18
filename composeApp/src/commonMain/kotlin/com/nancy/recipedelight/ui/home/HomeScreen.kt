@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,18 +18,16 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.nancy.recipedelight.domain.models.Category
 import com.nancy.recipedelight.domain.models.Meal
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.ui.graphics.Color
-import com.nancy.recipedelight.ui.HomeViewModel
+import com.nancy.recipedelight.ui.viewmodel.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
-
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
-    onCategoryClick: (String) -> Unit
+    onCategoryClick: (String) -> Unit,
+    onMealClick: (String) -> Unit
 ) {
-
     val randomMeal = viewModel.randomMeal
     val categories = viewModel.categories
 
@@ -37,7 +36,6 @@ fun HomeScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-
         Text(
             text = "Recipe Delight",
             style = MaterialTheme.typography.titleLarge,
@@ -46,11 +44,10 @@ fun HomeScreen(
             color = Color.Blue
         )
 
-
         // Random Meal Card
-        randomMeal?.let { meal ->
+        randomMeal?.let { meal: Meal ->
             RandomMealCard(meal) {
-                // TODO: navigate to Meal Details
+                onMealClick(meal.id)
             }
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -69,7 +66,7 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxHeight()
         ) {
-            items(categories) { category ->
+            items(items = categories) { category: Category ->
                 CategoryItem(category) {
                     onCategoryClick(category.name)
                 }

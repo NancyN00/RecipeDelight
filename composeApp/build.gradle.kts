@@ -1,4 +1,13 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+val gKey = localProperties.getProperty("GEMINI_API_KEY") ?: ""
+
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -45,6 +54,11 @@ kotlin {
 
                 //splash
                 implementation(libs.androidx.core.splashscreen)
+
+                implementation(libs.retrofit)
+                implementation(libs.converter.gson)
+                implementation(libs.okhttp)
+                implementation(libs.logging.interceptor)
 
             }
         }
@@ -98,16 +112,28 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
     buildTypes {
+        getByName("debug") {
+            buildConfigField("String", "GEMINI_API_KEY", "\"$gKey\"")
+        }
         getByName("release") {
             isMinifyEnabled = false
+            buildConfigField("String", "GEMINI_API_KEY", "\"$gKey\"")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

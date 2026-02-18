@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.nancy.recipedelight.domain.models.Meal
-import com.nancy.recipedelight.ui.HomeViewModel
+import com.nancy.recipedelight.ui.viewmodel.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

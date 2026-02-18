@@ -1,4 +1,4 @@
-package com.nancy.recipedelight
+package com.nancy.recipedelight.sql
 
 import android.content.Context
 import app.cash.sqldelight.db.SqlDriver
@@ -8,7 +8,7 @@ import com.nancy.recipedelight.data.local.RecipeDatabase
 class DriverFactory(private val context: Context) {
     fun createDriver(): SqlDriver {
         return AndroidSqliteDriver(
-            schema = RecipeDatabase.Schema,
+            schema = RecipeDatabase.Companion.Schema,
             context = context,
             name = "recipe_delight.db"
         )

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Fork -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,20 L45,20 L45,80 L40,80 Z
+                          M50,20 L55,20 L55,80 L50,80 Z
+                          M60,20 L65,20 L65,80 L60,80 Z"/>
+
+    <!-- Spoon -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M80,40 Q90,30 100,40 Q110,50 100,60 Q90,70 80,60 Q70,50 80,40 Z"/>
+</vector>
+
+
+
+
