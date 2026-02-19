@@ -1,28 +1,26 @@
-import kotlin.Boolean;
-
 CREATE TABLE ChatEntity (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    mealId TEXT NOT NULL,      -- Use "general" or the specific Meal ID
-    role TEXT NOT NULL,        -- "user" or "model"
+    mealId TEXT NOT NULL,
+    role TEXT NOT NULL,
     message TEXT NOT NULL,
     timestamp INTEGER NOT NULL
 );
 
--- Save a new message
+-- Insert a message
 insertMessage:
 INSERT INTO ChatEntity(mealId, role, message, timestamp)
 VALUES (?, ?, ?, ?);
 
--- Get history for a specific context
+-- Get messages for a meal
 getMessagesByMealId:
 SELECT * FROM ChatEntity
 WHERE mealId = ?
 ORDER BY timestamp ASC;
 
--- Clear history for one specific meal
+-- Clear messages for a meal
 clearChatByMealId:
 DELETE FROM ChatEntity WHERE mealId = ?;
 
--- Clear all history (General AI reset)
+-- Clear all history
 deleteAllHistory:
 DELETE FROM ChatEntity;

@@ -1,15 +1,13 @@
 package com.nancy.recipedelight
 
-
-import GeminiViewModel
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.nancy.recipedelight.ui.viewmodel.GeminiViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.getValue
 
 class MainActivity : ComponentActivity() {
 

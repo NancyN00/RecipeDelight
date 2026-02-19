@@ -1,8 +1,7 @@
 package com.nancy.recipedelight.repo
 
-import com.nancy.recipedelight.BuildConfig
-import java.util.concurrent.TimeUnit
 import com.nancy.recipedelight.data.remote.GeminiApiService
+import com.nancy.recipedelight.ui.chefai.ChatMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -11,6 +10,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.concurrent.TimeUnit
 
 /** Makes the actual HTTP call to Gemini API.
  * Only exists in androidMain because it uses OkHttp, which is JVM/Android-only.
@@ -24,7 +24,7 @@ class GeminiApiServiceImpl(private val apiKey: String) : GeminiApiService {
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    // Updated to take a List of messages for chat style
+    // List of messages for chat style
     override suspend fun generateContent(history: List<ChatMessage>): String {
         if (apiKey.isBlank() || apiKey == "null") {
             return "Error: API Key is missing."

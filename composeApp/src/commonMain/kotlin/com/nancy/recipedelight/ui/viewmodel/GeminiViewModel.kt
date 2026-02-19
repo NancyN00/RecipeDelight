@@ -1,3 +1,5 @@
+package com.nancy.recipedelight.ui.viewmodel
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nancy.recipedelight.domain.repositories.GeminiRepository
@@ -31,7 +33,7 @@ class GeminiViewModel(private val repository: GeminiRepository) : ViewModel() {
         }
 
         val userDisplayMessage = ChatMessage(role = "user", text = userInput)
-        _chatHistory.value = _chatHistory.value + userDisplayMessage
+        _chatHistory.value += userDisplayMessage
         _isLoading.value = true
 
         viewModelScope.launch {
@@ -41,15 +43,15 @@ class GeminiViewModel(private val repository: GeminiRepository) : ViewModel() {
                     history = _chatHistory.value,
                     firstMsgContext = finalInputForAI
                 )
-                _chatHistory.value = _chatHistory.value + ChatMessage(
-                    role = "model",
-                    text = response
-                )
+                _chatHistory.value += ChatMessage(
+                                    role = "model",
+                                    text = response
+                                )
             } catch (e: Exception) {
-                _chatHistory.value = _chatHistory.value + ChatMessage(
-                    role = "model",
-                    text = "Error: ${e.localizedMessage}"
-                )
+                _chatHistory.value += ChatMessage(
+                                    role = "model",
+                                    text = "Error: ${e.localizedMessage}"
+                                )
             } finally {
                 _isLoading.value = false
             }

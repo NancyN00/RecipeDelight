@@ -6,19 +6,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nancy.recipedelight.domain.repositories.MealRepository
-import com.nancy.recipedelight.ui.home.HomeScreen
-import com.nancy.recipedelight.ui.viewmodel.HomeViewModel
 import com.nancy.recipedelight.ui.bookmark.BookmarkScreen
 import com.nancy.recipedelight.ui.chefai.ChefAiScreen
+import com.nancy.recipedelight.ui.home.HomeScreen
 import com.nancy.recipedelight.ui.home.categories.CategoryScreen
-import com.nancy.recipedelight.ui.home.details.ChefAiChatContent
 import com.nancy.recipedelight.ui.home.details.MealDetailsScreen
 import com.nancy.recipedelight.ui.viewmodel.GeminiViewModel
 import org.koin.androidx.compose.get
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AppNavHost(
