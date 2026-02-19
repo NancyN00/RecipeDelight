@@ -1,36 +1,189 @@
 # 🍲 Recipe Delight
 
-**Recipe Delight** is a modern **Kotlin Multiplatform (KMP)** application designed to bring delicious meals closer to you. It bridges the gap between raw data and culinary inspiration, allowing users to explore, learn, and save dishes across **Android, Desktop, and Web**—all powered by a single, shared codebase.
+> A production-style **Kotlin Multiplatform (KMP)** application demonstrating scalable cross-platform architecture using a shared codebase for Android, Desktop, and Web.
 
 ---
 
-## 🚀 Key Features
+## 🚀 Overview
 
-* **Real-time Recipe Discovery:** Fetches culinary data from a remote REST API.
-* **AI-Powered Queries:** Leveraging AI to answer "What can I cook with these ingredients?" and generating custom cooking instructions.
-* **Cross-Platform Favorites:** Save your favorite meals locally and access them across all your devices.
-* **Reactive UI:** Built entirely with **Jetpack Compose** (Multiplatform) for a smooth, modern user experience.
+**Recipe Delight** is a modern multiplatform application built to explore real-world architectural challenges using Kotlin Multiplatform.
+
+It demonstrates how to:
+
+- Share business logic across platforms
+- Implement Clean Architecture in KMP
+- Apply the Repository pattern properly
+- Use offline-first caching strategies
+- Maintain platform-specific implementations cleanly
+
+The project emphasizes **architecture quality over UI complexity**.
+
+---
+
+## 🖥 Supported Platforms
+
+| Platform | Status |
+|----------|--------|
+| Android | ✅ Stable |
+| Desktop (JVM) | 🚧 In Progress |
+| Web (JS / WASM) | 🚧 Experimental |
+
+---
+
+## ✨ Core Features
+
+- 🔎 Real-time recipe discovery via REST API  
+- 🤖 AI-powered ingredient queries  
+- ❤️ Persistent cross-platform favorites  
+- 📡 Offline-first caching strategy  
+- ⚡ Reactive UI built with Compose Multiplatform  
 
 ---
 
 ## 🛠 Tech Stack
 
-| Layer | Technology |
-| :--- | :--- |
-| **Language** | Kotlin Multiplatform (KMP) |
-| **UI Framework** | Jetpack Compose Multiplatform |
-| **Dependency Injection** | **Koin** (Shared and Platform-specific) |
-| **Networking** | **Ktor** (Type-safe HTTP Client) |
-| **Local Storage** | **SQLDelight** (Persistent storage with SQLite) |
-| **AI Integration** | **Gemini AI** (Processing recipe queries and ingredient logic) |
-| **Concurrency** | Kotlin Coroutines & Flow |
+| Concern | Implementation |
+|----------|----------------|
+| Language | Kotlin Multiplatform |
+| UI | Jetpack Compose Multiplatform |
+| DI | Koin |
+| Networking | Ktor Client |
+| Persistence | SQLDelight |
+| Async | Coroutines + Flow |
+| AI | Gemini API |
 
 ---
 
-## 🏗 Architecture
+# 🏗 Architecture
 
-The project follows **Clean Architecture** principles to ensure the code is maintainable, testable, and scalable:
+The project follows **Clean Architecture + MVVM** adapted for Kotlin Multiplatform.
 
-1.  **Domain Layer:** Contains the business logic and entity definitions (Models).
-2.  **Data Layer:** Implements the **Repository Pattern**, managing data flow between the Ktor API and the SQLDelight database.
-3.  **Presentation Layer:** Uses the **MVVM Pattern** with ViewModels shared across platforms.
+## High-Level Flow
+
+```
+                ┌──────────────────────────┐
+                │     Presentation Layer    │
+                │  Compose UI + ViewModels  │
+                └──────────────┬───────────┘
+                               │
+                               ▼
+                ┌──────────────────────────┐
+                │       Domain Layer        │
+                │  UseCases + Core Models   │
+                └──────────────┬───────────┘
+                               │
+                               ▼
+                ┌──────────────────────────┐
+                │        Data Layer         │
+                │  Repository Implementation│
+                └───────┬──────────┬───────┘
+                        │          │
+                        ▼          ▼
+               ┌────────────┐   ┌──────────────┐
+               │   Ktor API │   │ SQLDelight DB│
+               └────────────┘   └──────────────┘
+```
+
+---
+
+## 📂 Multiplatform Structure
+
+```
+shared/
+ ├── commonMain
+ │    ├── domain/
+ │    ├── data/
+ │    ├── presentation/
+ │    └── di/
+ │
+ ├── androidMain
+ ├── desktopMain
+ └── jsMain
+```
+
+### Key Design Decision
+
+- **Business logic lives entirely in `commonMain`**
+- Platform-specific code is limited to:
+  - Database drivers
+  - Entry points
+  - Platform UI wiring
+
+This maximizes code reuse and minimizes duplication.
+
+---
+
+## 📡 Offline-First Strategy
+
+The application prioritizes local data access.
+
+### Workflow
+
+1. Fetch from API (Ktor)
+2. Cache locally (SQLDelight)
+3. Serve UI from local source
+4. Sync when network is available
+
+### Benefits
+
+- Faster perceived performance  
+- Reduced API dependency  
+- Stable UX offline  
+
+---
+
+## 🔧 Engineering Challenges & Solutions
+
+| Problem | Solution |
+|----------|----------|
+| HTTP 401 errors | Implemented secure API key injection |
+| HTTP 400 malformed body | Reworked JSON serialization |
+| SQLDelight schema issues | Fixed migration and table definition inconsistencies |
+| State crashes in Compose | Introduced safe UI state modeling |
+| Multiplatform driver setup | Structured platform-specific database drivers |
+
+---
+
+## 🧪 Testability & Scalability
+
+- Repository abstraction allows easy mocking
+- Use cases are platform-independent
+- DI ensures replaceable implementations
+- Architecture supports adding iOS with minimal friction
+
+---
+
+## 🎯 Why This Project Matters
+
+This project demonstrates:
+
+- Real KMP architecture (not just shared models)
+- Proper separation of concerns
+- Understanding of cross-platform constraints
+- Clean DI setup across targets
+- Scalable structure for production apps
+
+---
+
+## 📌 Project Status
+
+Android Actively developed.
+
+### Current Focus
+
+- Desktop stabilization
+- Web rendering improvements
+- Improved synchronization strategy
+
+---
+
+## 📈 What This Project Demonstrates
+
+- Architectural thinking before implementation  
+- Clean separation of layers  
+- Production-style project organization  
+- Multiplatform scalability  
+- Maintainable and extensible codebase  
+
+---
+
