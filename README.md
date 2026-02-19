@@ -1,6 +1,6 @@
 # 🍲 Recipe Delight
 
-**Recipe Delight** is a modern **Kotlin Multiplatform (KMP)** application designed to bring delicious meals closer to you. It bridges the gap between raw data and culinary inspiration, allowing users to explore, learn, and save dishes across **Android, iOS, Desktop, and Web**—all powered by a single, shared codebase.
+**Recipe Delight** is a modern **Kotlin Multiplatform (KMP)** application designed to bring delicious meals closer to you. It bridges the gap between raw data and culinary inspiration, allowing users to explore, learn, and save dishes across **Android, Desktop, and Web**—all powered by a single, shared codebase.
 
 ---
 
