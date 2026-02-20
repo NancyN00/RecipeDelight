@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(private val repository: MealRepository) : ViewModel() {
 
+
     var categories by mutableStateOf<List<Category>>(emptyList())
         private set
 

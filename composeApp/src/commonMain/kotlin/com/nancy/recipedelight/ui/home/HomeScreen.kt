@@ -2,73 +2,124 @@ package com.nancy.recipedelight.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.nancy.recipedelight.domain.models.Category
 import com.nancy.recipedelight.domain.models.Meal
-import androidx.compose.ui.graphics.Color
 import com.nancy.recipedelight.ui.viewmodel.HomeViewModel
+import com.nancy.recipedelight.ui.viewmodel.SettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
+    settingsViewModel: SettingsViewModel = koinViewModel(),
     onCategoryClick: (String) -> Unit,
     onMealClick: (String) -> Unit
 ) {
     val randomMeal = viewModel.randomMeal
     val categories = viewModel.categories
+    val isDark by settingsViewModel.isDarkMode.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Recipe Delight",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp),
-            color = Color.Blue
-        )
-
-        // Random Meal Card
-        randomMeal?.let { meal: Meal ->
-            RandomMealCard(meal) {
-                onMealClick(meal.id)
-            }
-            Spacer(modifier = Modifier.height(24.dp))
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Recipe Delight",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Blue
+                    )
+                },
+                actions = {
+                    IconButton(
+                        onClick = { settingsViewModel.onToggleDarkMode() },
+                        modifier = Modifier.semantics {
+                            contentDescription = if (isDark) "Switch to Light Mode" else "Switch to Dark Mode"
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                            contentDescription = null,
+                            tint = Color.Blue
+                        )
+                    }
+                }
+            )
         }
-
-        // Categories Grid
-        Text(
-            text = "Categories",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxHeight()
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 12.dp)
         ) {
-            items(items = categories) { category: Category ->
-                CategoryItem(category) {
-                    onCategoryClick(category.name)
+            // Random Meal Card
+            randomMeal?.let { meal: Meal ->
+                RandomMealCard(meal) {
+                    onMealClick(meal.id)
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
+            // Categories Grid
+            Text(
+                text = "Categories",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.semantics { contentDescription = "Recipe Categories Section" }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                items(items = categories) { category: Category ->
+                    CategoryItem(category) {
+                        onCategoryClick(category.name)
+                    }
                 }
             }
         }
@@ -81,14 +132,17 @@ fun RandomMealCard(meal: Meal, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .height(220.dp)
-            .clickable { onClick() },
+            .clickable(
+                onClickLabel = "View details for ${meal.name}",
+                onClick = onClick
+            ),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Box {
             Image(
                 painter = rememberAsyncImagePainter(meal.thumb),
-                contentDescription = meal.name,
+                contentDescription = "Featured meal: ${meal.name}",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
@@ -97,13 +151,12 @@ fun RandomMealCard(meal: Meal, onClick: () -> Unit) {
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
-                    .padding(8.dp)
             ) {
                 Text(
                     text = meal.name,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier.padding(12.dp)
                 )
             }
         }
@@ -116,7 +169,10 @@ fun CategoryItem(category: Category, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .height(140.dp)
-            .clickable { onClick() },
+            .clickable(
+                onClickLabel = "View category ${category.name}",
+                onClick = onClick
+            ),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -124,7 +180,7 @@ fun CategoryItem(category: Category, onClick: () -> Unit) {
             category.thumb?.let {
                 Image(
                     painter = rememberAsyncImagePainter(it),
-                    contentDescription = category.name,
+                    contentDescription = "Category image for ${category.name}",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -139,7 +195,7 @@ fun CategoryItem(category: Category, onClick: () -> Unit) {
                     text = category.name,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    modifier = Modifier.padding(6.dp)
+                    modifier = Modifier.padding(8.dp)
                 )
             }
         }

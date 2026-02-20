@@ -1,0 +1,19 @@
+CREATE TABLE AppSettings (
+    id INTEGER NOT NULL PRIMARY KEY,
+    isDarkMode INTEGER NOT NULL DEFAULT 0
+);
+
+-- Insert default row if missing
+insertDefaultSettings:
+INSERT OR IGNORE INTO AppSettings(id, isDarkMode)
+VALUES(1, 0);
+
+-- Update dark mode
+updateDarkMode:
+UPDATE AppSettings
+SET isDarkMode = ?
+WHERE id = 1;
+
+-- Get current dark mode
+getDarkMode:
+SELECT isDarkMode FROM AppSettings WHERE id = 1;
