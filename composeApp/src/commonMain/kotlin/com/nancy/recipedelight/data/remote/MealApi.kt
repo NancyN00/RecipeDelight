@@ -19,6 +19,9 @@ object MealApi {
 
     suspend fun getMealDetails(client: HttpClient, mealId: String): MealResponse =
         client.get("${BASE_URL}lookup.php?i=$mealId").body()
+
+    suspend fun searchMeals(client: HttpClient, query: String): MealResponse =
+        client.get("${BASE_URL}search.php?s=$query").body()
 }
 
 /** --- Response DTOs --- */

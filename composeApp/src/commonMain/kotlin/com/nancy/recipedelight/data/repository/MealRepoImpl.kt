@@ -83,6 +83,21 @@ class MealRepoImpl(
             )
         }
     }
+
+    override suspend fun searchMeals(query: String): List<Meal> {
+        return try {
+            // 1. Use MealApi or client.get directly.
+            // Based on your code, let's add a search method to your MealApi or call via client:
+            val response: MealResponse = MealApi.searchMeals(client, query)
+
+            // 2. Map the List<MealDto> to List<Meal> using your private toDomain() extension
+            response.meals?.map { it.toDomain() } ?: emptyList()
+
+        } catch (e: Exception) {
+            // Return empty list on failure so the ViewModel handles the "Not Found" state
+            emptyList()
+        }
+    }
 }
 
 //Domain mapping for the Database

@@ -24,4 +24,6 @@ interface MealRepository {
 
     //The action to add or remove
     suspend fun toggleBookmark(meal: Meal)
+
+    suspend fun searchMeals(query: String): List<Meal>
 }

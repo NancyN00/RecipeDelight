@@ -10,6 +10,7 @@ import com.nancy.recipedelight.domain.models.Category
 import com.nancy.recipedelight.domain.models.Meal
 import com.nancy.recipedelight.domain.repositories.MealRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -19,11 +20,17 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(private val repository: MealRepository) : ViewModel() {
 
-
     var categories by mutableStateOf<List<Category>>(emptyList())
         private set
 
     var randomMeal by mutableStateOf<Meal?>(null)
+        private set
+
+    // Inside HomeViewModel
+    var searchQuery by mutableStateOf("")
+        private set
+
+    var searchError by mutableStateOf<String?>(null)
         private set
 
     // observe all bookmarked meals for a "Favorites" row on Home
@@ -71,6 +78,36 @@ class HomeViewModel(private val repository: MealRepository) : ViewModel() {
         viewModelScope.launch {
             repository.toggleBookmark(meal)
         }
+    }
+
+
+    fun onSearchQueryChange(newQuery: String) {
+        searchQuery = newQuery
+        if (newQuery.isEmpty()) {
+            searchError = null
+        }
+    }
+
+    // Inside HomeViewModel
+    fun performSearch() {
+        if (searchQuery.isBlank()) return
+
+        viewModelScope.launch {
+            val results = repository.searchMeals(searchQuery)
+
+            if (results.isEmpty()) {
+                searchError = "No recipes found for '$searchQuery'"
+                delay(3000)
+                searchError = null
+            } else {
+                searchError = null
+            }
+        }
+    }
+
+    fun clearSearch() {
+        searchQuery = ""
+        searchError = null
     }
 
 }

@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.nancy.recipedelight.domain.models.Category
 import com.nancy.recipedelight.domain.models.Meal
+import com.nancy.recipedelight.ui.search.RecipeSearchBar
 import com.nancy.recipedelight.ui.viewmodel.HomeViewModel
 import com.nancy.recipedelight.ui.viewmodel.SettingsViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -93,6 +94,17 @@ fun HomeScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 12.dp)
         ) {
+
+            RecipeSearchBar(
+                query = viewModel.searchQuery,
+                error = viewModel.searchError,
+                onQueryChange = { viewModel.onSearchQueryChange(it) },
+                onSearch = { viewModel.performSearch() },
+                onClear = { viewModel.clearSearch() },
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
             // Random Meal Card
             randomMeal?.let { meal: Meal ->
                 RandomMealCard(meal) {
