@@ -2,7 +2,7 @@ package com.nancy.recipedelight.di
 
 import com.nancy.recipedelight.data.db.listAdapter
 import com.nancy.recipedelight.data.local.AppSettingsQueries
-import com.nancy.recipedelight.data.local.BookmarkEntity
+import com.nancy.recipedelight.data.local.MealEntity
 import com.nancy.recipedelight.data.local.RecipeDatabase
 import com.nancy.recipedelight.data.repository.AppSettingsRepositoryImpl
 import com.nancy.recipedelight.data.repository.MealRepoImpl
@@ -13,22 +13,20 @@ import org.koin.dsl.module
 val appModule = module {
     single { HttpClientFactory.create() }
 
-    // Provide the Database
     single {
         RecipeDatabase(
             driver = get(),
-            BookmarkEntityAdapter = BookmarkEntity.Adapter(
+            MealEntityAdapter = MealEntity.Adapter(
                 tagsAdapter = listAdapter,
-                ingredientsAdapter = listAdapter
+                ingredientsAdapter = listAdapter,
             )
         )
     }
 
-    // Provide Queries
-    single<AppSettingsQueries> { get<RecipeDatabase>().appSettingsQueries }
     single { get<RecipeDatabase>().mealQueries }
+    single<AppSettingsQueries> { get<RecipeDatabase>().appSettingsQueries }
 
-    // Repositories
     single<MealRepository> { MealRepoImpl(get(), get()) }
+
     single<AppSettingsRepository> { AppSettingsRepositoryImpl(get()) }
 }

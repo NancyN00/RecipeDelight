@@ -112,7 +112,7 @@ fun MealDetailsScreen(
                                 val wasBookmarked = isBookmarked
                                 repository.toggleBookmark(currentMeal)
                                 if (!wasBookmarked) {
-                                    Toast.makeText(context, "meal added on details screen", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "meal added", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }) {
@@ -183,7 +183,7 @@ fun MealDetailsScreen(
                 Text(
                     text = m.instructions ?: "-",
                     style = MaterialTheme.typography.bodyMedium,
-                 //   modifier = Modifier.padding(horizontal = 16.dp, bottom = 32.dp)
+                  modifier = Modifier.padding(horizontal = 16.dp)
                 )
             }
         } ?: run {
@@ -270,7 +270,7 @@ fun ChefAiChatContent(
             Button(
                 onClick = {
                     if (userInput.isNotBlank()) {
-                        // Simply pass the input and the mealContext.
+                        // pass the input and the mealContext.
                         // The ViewModel will handle the "Context: I am looking at..." part.
                         viewModel.sendMessage(userInput, mealContext ?: "")
                         userInput = ""
@@ -291,18 +291,3 @@ fun ChefAiChatContent(
     }
 }
 
-@Composable
-fun ChatBubble(text: String, isUser: Boolean) {
-    Box(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        contentAlignment = if (isUser) Alignment.CenterEnd else Alignment.CenterStart
-    ) {
-        Surface(
-            color = if (isUser) Color.Blue else Color.LightGray,
-            contentColor = if (isUser) Color.White else Color.Black,
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text(text = text, modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.bodyMedium)
-        }
-    }
-}

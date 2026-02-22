@@ -14,7 +14,6 @@ val geminiModule = module {
     // Android-only API service (needs BuildConfig)
     single<GeminiApiService> { GeminiApiServiceImpl(BuildConfig.GEMINI_API_KEY) }
 
-    // This tells Koin: "Find the RecipeDatabase and give me its chatEntityQueries"
     single { get<RecipeDatabase>().chatEntityQueries }
 
     single { GeminiRepository(get(), get()) }

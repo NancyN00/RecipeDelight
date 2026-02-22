@@ -36,7 +36,7 @@ fun AppNavHost(
                     navController.navigate(Screen.CategoryMeals.createRoute(categoryName))
                 },
                 onMealClick = { id ->
-                    // Use the helper from the Screen class to ensure the string is perfect
+                    // helper from the Screen class ensure the string is perfect
                     navController.navigate(Screen.MealDetails.createRoute(id))
                 }
             )
@@ -46,7 +46,6 @@ fun AppNavHost(
         composable(Screen.Bookmarks.route) {
             BookmarkScreen(
                 onMealClick = { id ->
-                    // Use the helper from the Screen class to ensure the string is perfect
                     navController.navigate(Screen.MealDetails.createRoute(id))
                 })
         }
@@ -67,7 +66,11 @@ fun AppNavHost(
                 repository = repository,
                 onMealClick = { mealId ->
                     navController.navigate(Screen.MealDetails.createRoute(mealId))
+                },
+                onBackClick = {
+                    navController.popBackStack()
                 }
+
             )
         }
 

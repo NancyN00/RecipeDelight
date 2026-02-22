@@ -89,6 +89,7 @@ kotlin {
                 //SqlDelight
                 implementation(libs.sqldelight.coroutines)
                 implementation(libs.sqldelight.runtime)
+                implementation(libs.sqldelight.primitive.adapters)
 
 
             }

@@ -14,8 +14,6 @@ interface MealRepository {
     suspend fun getMealsByCategory(categoryName: String): List<MealSummary>
 
     suspend fun getMealDetails(mealId: String): Meal?
-
-    // Database operations
     fun getBookmarkedMeals(): Flow<List<Meal>>
 
     fun isMealBookmarked(id: String): Flow<Boolean>

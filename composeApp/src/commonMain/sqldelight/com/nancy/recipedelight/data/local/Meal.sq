@@ -1,35 +1,59 @@
+import kotlin.Boolean;
 import kotlin.collections.List;
 import kotlin.String;
 
-CREATE TABLE BookmarkEntity (
-    id TEXT NOT NULL PRIMARY KEY,
-    name TEXT NOT NULL,
+CREATE TABLE MealEntity (
+    id TEXT NOT NULL PRIMARY KEY,    name TEXT NOT NULL,
     category TEXT,
     area TEXT,
     instructions TEXT,
     thumb TEXT,
-    tags TEXT AS List<String>,
+    tags TEXT AS kotlin.collections.List<kotlin.String>,
     youtube TEXT,
-    ingredients TEXT AS List<String>
+    ingredients TEXT AS kotlin.collections.List<kotlin.String>,
+    isBookmarked INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0
+
 );
 
--- For toggleBookmark: Logic to add
-insertBookmark:
-INSERT OR REPLACE INTO BookmarkEntity(id, name, category, area, instructions, thumb, tags, youtube, ingredients)
-VALUES ?;
+CREATE TABLE CategoryEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    thumb TEXT,
+    description TEXT
+);
 
--- For toggleBookmark: Logic to remove
-deleteBookmark:
-DELETE FROM BookmarkEntity WHERE id = ?;
+CREATE TABLE MealSummaryEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    thumb TEXT,
+    category TEXT
+);
 
--- For getBookmarkedMeals(): The Favorites stream
+-- QUERIES
+insertMeal:
+INSERT OR REPLACE INTO MealEntity(id, name, category, area, instructions, thumb, tags, youtube, ingredients, isBookmarked)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateBookmarkStatus:
+UPDATE MealEntity SET isBookmarked = ? WHERE id = ?;
+
 selectAllBookmarks:
-SELECT * FROM BookmarkEntity;
+SELECT * FROM MealEntity WHERE isBookmarked = 1;
 
--- For isMealBookmarked(): The status check
 isBookmarked:
-SELECT COUNT(*) FROM BookmarkEntity WHERE id = ?;
+SELECT COUNT(*) FROM MealEntity WHERE id = ? AND isBookmarked = 1;
 
--- For toggleBookmark: Checking if it exists before adding/removing
-selectBookmarkById:
-SELECT * FROM BookmarkEntity WHERE id = ?;
+selectMealById:
+SELECT * FROM MealEntity WHERE id = ?;
+
+insertCategory:
+INSERT OR REPLACE INTO CategoryEntity VALUES ?;
+
+selectAllCategories:
+SELECT * FROM CategoryEntity;
+
+insertMealSummary:
+INSERT OR REPLACE INTO MealSummaryEntity VALUES ?;
+
+selectSummariesByCategory:
+SELECT * FROM MealSummaryEntity WHERE category = ?;

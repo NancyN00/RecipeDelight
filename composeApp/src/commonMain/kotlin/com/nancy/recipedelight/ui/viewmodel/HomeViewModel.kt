@@ -38,9 +38,16 @@ class HomeViewModel(private val repository: MealRepository) : ViewModel() {
     var networkError by mutableStateOf<String?>(null)
         private set
 
+    var isLoadingCategories by mutableStateOf(false)
+        private set
+    var isLoadingRandomMeal by mutableStateOf(false)
+        private set
+    var isSearching by mutableStateOf(false)
+        private set
+
     val bookmarkedMeals: StateFlow<List<Meal>> = repository.getBookmarkedMeals()
         .stateIn(
-            scope = viewModelScope,
+            viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
@@ -50,59 +57,58 @@ class HomeViewModel(private val repository: MealRepository) : ViewModel() {
         .flatMapLatest { meal ->
             if (meal == null) flowOf(false)
             else repository.isMealBookmarked(meal.id)
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
-        )
+        }.stateIn(viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = false)
 
     init {
-        viewModelScope.launch {
-            fetchCategories()
-            fetchRandomMeal()
-        }
+        fetchAll()
+    }
+
+    private fun fetchAll() {
+        viewModelScope.launch { fetchCategories() }
+        viewModelScope.launch { fetchRandomMeal() }
     }
 
     private suspend fun fetchCategories() {
+        isLoadingCategories = true
         try {
             categories = repository.getCategories()
             networkError = null
         } catch (e: IOException) {
-            networkError = "No internet connection. Please try again."
+            networkError = "No internet. Showing cached data."
         } catch (e: Exception) {
             networkError = "Failed to load categories."
+        } finally {
+            isLoadingCategories = false
         }
     }
 
     private suspend fun fetchRandomMeal() {
+        isLoadingRandomMeal = true
         try {
             randomMeal = repository.getRandomMeal()
             networkError = null
         } catch (e: IOException) {
-            networkError = "No internet connection. Please try again."
+            networkError = "No internet. Showing cached data."
         } catch (e: Exception) {
             networkError = "Failed to load random meal."
+        } finally {
+            isLoadingRandomMeal = false
         }
     }
 
     fun toggleBookmark(meal: Meal) {
-        viewModelScope.launch {
-            repository.toggleBookmark(meal)
-        }
+        viewModelScope.launch { repository.toggleBookmark(meal) }
     }
 
     fun onSearchQueryChange(newQuery: String) {
         searchQuery = newQuery
-        if (newQuery.isEmpty()) {
-            searchError = null
-        }
+        if (newQuery.isEmpty()) searchError = null
     }
 
     fun performSearch() {
         if (searchQuery.isBlank()) return
-
         viewModelScope.launch {
+            isSearching = true
             try {
                 val results = repository.searchMeals(searchQuery)
                 if (results.isEmpty()) {
@@ -114,9 +120,11 @@ class HomeViewModel(private val repository: MealRepository) : ViewModel() {
                 }
                 networkError = null
             } catch (e: IOException) {
-                networkError = "No internet connection. Please try again."
+                networkError = "No internet. Showing cached results."
             } catch (e: Exception) {
-                networkError = "Failed to perform search."
+                networkError = "Failed to search meals."
+            } finally {
+                isSearching = false
             }
         }
     }
