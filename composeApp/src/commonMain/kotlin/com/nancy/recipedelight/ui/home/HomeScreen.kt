@@ -35,8 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,29 +56,18 @@ fun HomeScreen(
 ) {
     val randomMeal = viewModel.randomMeal
     val categories = viewModel.categories
+    val networkError = viewModel.networkError
     val isDark by settingsViewModel.isDarkMode.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = "Recipe Delight",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Blue
-                    )
-                },
+                title = { Text("Recipe Delight", color = Color.Blue) },
                 actions = {
-                    IconButton(
-                        onClick = { settingsViewModel.onToggleDarkMode() },
-                        modifier = Modifier.semantics {
-                            contentDescription = if (isDark) "Switch to Light Mode" else "Switch to Dark Mode"
-                        }
-                    ) {
+                    IconButton(onClick = { settingsViewModel.onToggleDarkMode() }) {
                         Icon(
                             imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
-                            contentDescription = null,
+                            contentDescription = "Toggle dark mode",
                             tint = Color.Blue
                         )
                     }
@@ -105,32 +92,50 @@ fun HomeScreen(
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-            // Random Meal Card
-            randomMeal?.let { meal: Meal ->
-                RandomMealCard(meal) {
-                    onMealClick(meal.id)
-                }
-                Spacer(modifier = Modifier.height(24.dp))
+
+            networkError?.let { errorMsg ->
+                Text(
+                    text = errorMsg,
+                    color = Color.Red,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(16.dp)
+                )
+                return@Column
             }
 
-            // Categories Grid
-            Text(
-                text = "Categories",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.semantics { contentDescription = "Recipe Categories Section" }
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+            if (viewModel.searchResults.isNotEmpty()) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxHeight()
+                ) {
+                    items(viewModel.searchResults) { meal ->
+                        RandomMealCard(meal) { onMealClick(meal.id) }
+                    }
+                }
+            } else {
+                randomMeal?.let { meal ->
+                    RandomMealCard(meal) { onMealClick(meal.id) }
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                items(items = categories) { category: Category ->
-                    CategoryItem(category) {
-                        onCategoryClick(category.name)
+                Text(
+                    text = "Categories",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxHeight()
+                ) {
+                    items(categories) { category ->
+                        CategoryItem(category) { onCategoryClick(category.name) }
                     }
                 }
             }
@@ -158,6 +163,7 @@ fun RandomMealCard(meal: Meal, onClick: () -> Unit) {
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
+
             Surface(
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
                 modifier = Modifier
@@ -197,6 +203,7 @@ fun CategoryItem(category: Category, onClick: () -> Unit) {
                     modifier = Modifier.fillMaxSize()
                 )
             }
+
             Surface(
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
                 modifier = Modifier

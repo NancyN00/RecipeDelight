@@ -10,13 +10,13 @@ import com.nancy.recipedelight.domain.models.Category
 import com.nancy.recipedelight.domain.models.Meal
 import com.nancy.recipedelight.domain.repositories.MealRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class HomeViewModel(private val repository: MealRepository) : ViewModel() {
 
@@ -26,25 +26,25 @@ class HomeViewModel(private val repository: MealRepository) : ViewModel() {
     var randomMeal by mutableStateOf<Meal?>(null)
         private set
 
-    // Inside HomeViewModel
+    var searchResults by mutableStateOf<List<Meal>>(emptyList())
+        private set
+
     var searchQuery by mutableStateOf("")
         private set
 
     var searchError by mutableStateOf<String?>(null)
         private set
 
-    // observe all bookmarked meals for a "Favorites" row on Home
+    var networkError by mutableStateOf<String?>(null)
+        private set
+
     val bookmarkedMeals: StateFlow<List<Meal>> = repository.getBookmarkedMeals()
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Companion.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
 
-    // Observe if the CURRENT random meal is bookmarked
-    // This updates automatically whenever the randomMeal changes OR the DB changes
-    // use flatMapLatest so that if the random meal changes,
-    // stop watching the old ID and start watching the new one.
     @OptIn(ExperimentalCoroutinesApi::class)
     val isRandomMealBookmarked: StateFlow<Boolean> = snapshotFlow { randomMeal }
         .flatMapLatest { meal ->
@@ -53,10 +53,9 @@ class HomeViewModel(private val repository: MealRepository) : ViewModel() {
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Companion.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = false
         )
-
 
     init {
         viewModelScope.launch {
@@ -66,20 +65,32 @@ class HomeViewModel(private val repository: MealRepository) : ViewModel() {
     }
 
     private suspend fun fetchCategories() {
-        categories = repository.getCategories()
+        try {
+            categories = repository.getCategories()
+            networkError = null
+        } catch (e: IOException) {
+            networkError = "No internet connection. Please try again."
+        } catch (e: Exception) {
+            networkError = "Failed to load categories."
+        }
     }
 
     private suspend fun fetchRandomMeal() {
-        randomMeal = repository.getRandomMeal()
+        try {
+            randomMeal = repository.getRandomMeal()
+            networkError = null
+        } catch (e: IOException) {
+            networkError = "No internet connection. Please try again."
+        } catch (e: Exception) {
+            networkError = "Failed to load random meal."
+        }
     }
 
-    // Toggle action for the Random Meal or Favorites list
     fun toggleBookmark(meal: Meal) {
         viewModelScope.launch {
             repository.toggleBookmark(meal)
         }
     }
-
 
     fun onSearchQueryChange(newQuery: String) {
         searchQuery = newQuery
@@ -88,26 +99,32 @@ class HomeViewModel(private val repository: MealRepository) : ViewModel() {
         }
     }
 
-    // Inside HomeViewModel
     fun performSearch() {
         if (searchQuery.isBlank()) return
 
         viewModelScope.launch {
-            val results = repository.searchMeals(searchQuery)
-
-            if (results.isEmpty()) {
-                searchError = "No recipes found for '$searchQuery'"
-                delay(3000)
-                searchError = null
-            } else {
-                searchError = null
+            try {
+                val results = repository.searchMeals(searchQuery)
+                if (results.isEmpty()) {
+                    searchResults = emptyList()
+                    searchError = "No recipes found for '$searchQuery'"
+                } else {
+                    searchResults = results
+                    searchError = null
+                }
+                networkError = null
+            } catch (e: IOException) {
+                networkError = "No internet connection. Please try again."
+            } catch (e: Exception) {
+                networkError = "Failed to perform search."
             }
         }
     }
 
     fun clearSearch() {
         searchQuery = ""
+        searchResults = emptyList()
         searchError = null
+        networkError = null
     }
-
 }

@@ -5,8 +5,16 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
 import com.nancy.recipedelight.data.local.BookmarkEntity
 import com.nancy.recipedelight.data.local.MealQueries
-import com.nancy.recipedelight.data.remote.*
-import com.nancy.recipedelight.domain.models.*
+import com.nancy.recipedelight.data.remote.CategoriesResponse
+import com.nancy.recipedelight.data.remote.CategoryDto
+import com.nancy.recipedelight.data.remote.MealApi
+import com.nancy.recipedelight.data.remote.MealDto
+import com.nancy.recipedelight.data.remote.MealResponse
+import com.nancy.recipedelight.data.remote.MealSummaryDto
+import com.nancy.recipedelight.data.remote.MealsByCategoryResponse
+import com.nancy.recipedelight.domain.models.Category
+import com.nancy.recipedelight.domain.models.Meal
+import com.nancy.recipedelight.domain.models.MealSummary
 import com.nancy.recipedelight.domain.repositories.MealRepository
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.Dispatchers
@@ -18,39 +26,60 @@ class MealRepoImpl(
     private val queries: MealQueries
 ) : MealRepository {
 
-    //API IMPLEMENTATION
+    /** NETWORK IMPLEMENTATION */
 
-    override suspend fun getRandomMeal(): Meal {
-        val response = MealApi.getRandomMeal(client)
-        val mealDto = response.meals?.firstOrNull()
-        return mealDto?.toDomain() ?: throw IllegalStateException("No random meal found")
+    override suspend fun getRandomMeal(): Meal? {
+        return try {
+            val response = MealApi.getRandomMeal(client)
+            response.meals?.firstOrNull()?.toDomain()
+        } catch (e: Exception) {
+            null
+        }
     }
 
     override suspend fun getCategories(): List<Category> {
-        val response = MealApi.getCategories(client)
-        return response.categories?.map { it.toDomain() } ?: emptyList()
+        return try {
+            val response: CategoriesResponse = MealApi.getCategories(client)
+            response.categories?.map { it.toDomain() } ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     override suspend fun getMealsByCategory(categoryName: String): List<MealSummary> {
-        val response = MealApi.getMealsByCategory(client, categoryName)
-        return response.meals?.map { it.toDomain() } ?: emptyList()
+        return try {
+            val response: MealsByCategoryResponse = MealApi.getMealsByCategory(client, categoryName)
+            response.meals?.map { it.toDomain() } ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
-    override suspend fun getMealDetails(mealId: String): Meal {
-        val response = MealApi.getMealDetails(client, mealId)
-        val mealDto = response.meals?.firstOrNull()
-        return mealDto?.toDomain() ?: throw IllegalStateException("Meal not found for ID: $mealId")
+    override suspend fun getMealDetails(mealId: String): Meal? {
+        return try {
+            val response = MealApi.getMealDetails(client, mealId)
+            response.meals?.firstOrNull()?.toDomain()
+        } catch (e: Exception) {
+            null
+        }
     }
 
-    //DATABASE IMPLEMENTATION
+    override suspend fun searchMeals(query: String): List<Meal> {
+        return try {
+            val response: MealResponse = MealApi.searchMeals(client, query)
+            response.meals?.map { it.toDomain() } ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    /** DATABASE IMPLEMENTATION */
 
     override fun getBookmarkedMeals(): Flow<List<Meal>> {
         return queries.selectAllBookmarks()
             .asFlow()
             .mapToList(Dispatchers.Default)
-            .map { entities ->
-                entities.map { it.toDomain() }
-            }
+            .map { entities -> entities.map { it.toDomain() } }
     }
 
     override fun isMealBookmarked(id: String): Flow<Boolean> {
@@ -60,11 +89,8 @@ class MealRepoImpl(
             .map { count -> count > 0 }
     }
 
-
     override suspend fun toggleBookmark(meal: Meal) {
-        // Check if it exists using the count query
         val exists = queries.isBookmarked(meal.id).executeAsOne() > 0
-
         if (exists) {
             queries.deleteBookmark(meal.id)
         } else {
@@ -83,41 +109,23 @@ class MealRepoImpl(
             )
         }
     }
-
-    override suspend fun searchMeals(query: String): List<Meal> {
-        return try {
-            // 1. Use MealApi or client.get directly.
-            // Based on your code, let's add a search method to your MealApi or call via client:
-            val response: MealResponse = MealApi.searchMeals(client, query)
-
-            // 2. Map the List<MealDto> to List<Meal> using your private toDomain() extension
-            response.meals?.map { it.toDomain() } ?: emptyList()
-
-        } catch (e: Exception) {
-            // Return empty list on failure so the ViewModel handles the "Not Found" state
-            emptyList()
-        }
-    }
 }
 
-//Domain mapping for the Database
-fun BookmarkEntity.toDomain(): Meal {
-    return Meal(
-        id = id,
-        name = name,
-        category = category,
-        area = area,
-        instructions = instructions,
-        thumb = thumb,
-        tags = tags ?: emptyList(),
-        youtube = youtube,
-        ingredients = ingredients ?: emptyList()
-    )
-}
+/** DATABASE MAPPING */
 
-/** --- DTO to Domain mapping
- * this toDomain() extension functions are for Network DTOs--- */
+fun BookmarkEntity.toDomain(): Meal = Meal(
+    id = id,
+    name = name,
+    category = category,
+    area = area,
+    instructions = instructions,
+    thumb = thumb,
+    tags = tags ?: emptyList(),
+    youtube = youtube,
+    ingredients = ingredients ?: emptyList()
+)
 
+/**  NETWORK DTO TO DOMAIN */
 private fun MealDto.toDomain(): Meal {
     val ingredients = listOfNotNull(
         strIngredient1, strIngredient2, strIngredient3, strIngredient4, strIngredient5,
