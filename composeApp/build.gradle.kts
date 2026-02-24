@@ -46,14 +46,17 @@ kotlin {
                 // Ktor Android engine + Koin Android
                 implementation(libs.ktor.client.okhttp)
                 implementation(libs.koin.android)
-                implementation(libs.coil.compose)
                 implementation(libs.koin.androidx.compose)
+
 
                 //sqldelight
                 implementation(libs.sqldelight.android.driver)
 
                 //splash
                 implementation(libs.androidx.core.splashscreen)
+
+                //coil
+                implementation(libs.coil.compose)
 
                 implementation(libs.retrofit)
                 implementation(libs.converter.gson)

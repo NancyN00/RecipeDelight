@@ -18,5 +18,5 @@ val geminiModule = module {
 
     single { GeminiRepository(get(), get()) }
 
-    viewModel { GeminiViewModel(get()) }
+    viewModel { GeminiViewModel(get(), get()) }
 }

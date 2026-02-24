@@ -3,6 +3,7 @@ package com.nancy.recipedelight.ui.chefai
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,12 +13,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MicNone
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,6 +33,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,10 +44,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.nancy.recipedelight.ui.viewmodel.GeminiViewModel
+import com.nancy.recipedelight.voice.VoiceRecognizer
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 data class ChatMessage(
     val role: String, // "user" or "model"
@@ -51,81 +56,64 @@ data class ChatMessage(
 )
 
 @Composable
-fun ChefAiScreen(viewModel: GeminiViewModel = koinViewModel()) {
-    var userInput by remember { mutableStateOf("") }
-    var showHistory by remember { mutableStateOf(false) } // Track if history is loaded
-
-    val chatHistory by viewModel.chatHistory.collectAsState(initial = emptyList())
+fun ChefAiScreen(
+    viewModel: GeminiViewModel = koinViewModel(),
+    voiceRecognizer: VoiceRecognizer = koinInject()
+) {
+    val chatHistory by viewModel.chatHistory.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val mealId = "general"
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)
-    ) {
-        // Header Row
+    val voiceState by viewModel.voiceState.collectAsState()
+    val userInput by viewModel.userInput.collectAsState()
+
+    var showHistory by remember { mutableStateOf(false) }
+    val mealId = "general"
+    val listState = rememberLazyListState()
+
+    // Auto-scroll to bottom when new messages arrive
+    LaunchedEffect(chatHistory.size, isLoading) {
+        if (chatHistory.isNotEmpty()) {
+            listState.animateScrollToItem(chatHistory.size - 1)
+        }
+    }
+
+
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        // Header
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "Chef AI",
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.Blue,
-                fontWeight = FontWeight.Bold
-            )
-
-            // History Button
-            IconButton(onClick = {
-                showHistory = true
-                viewModel.loadChatHistory(mealId)
-            }) {
-                Icon(
-                    imageVector = Icons.Default.History,
-                    contentDescription = "Load chat history",
-                    tint = Color.Blue
-                )
+            Text("Chef AI", style = MaterialTheme.typography.headlineMedium, color = Color.Blue)
+            IconButton(onClick = { showHistory = true; viewModel.loadChatHistory(mealId) }) {
+                Icon(Icons.Default.History, contentDescription = "History", tint = Color.Blue)
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(Modifier.height(8.dp))
 
-        // Chat Area
+        // Chat area
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
             if (chatHistory.isEmpty() && !isLoading && !showHistory) {
-                // Placeholder before any messages or history
-                Text(
-                    text = "Ask me anything about cooking...",
-                    color = Color.Gray,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                Text("Ask me anything about cooking...", color = Color.Gray, modifier = Modifier.align(Alignment.Center))
             } else {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(chatHistory) { message ->
-                        ChatBubble(message)
-                    }
-
-                    if (isLoading) {
-                        item { ThinkingBubble() }
-                    }
+                    state = listState,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(chatHistory) { message -> ChatBubble(message) }
+                    if (isLoading) item { ThinkingBubble() }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
 
-        // Input Row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        // Input + buttons
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
             OutlinedTextField(
                 value = userInput,
-                onValueChange = { userInput = it },
+                onValueChange = { viewModel.updateUserInput(it) },
                 label = { Text("Ask about cooking...") },
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp),
@@ -134,33 +122,45 @@ fun ChefAiScreen(viewModel: GeminiViewModel = koinViewModel()) {
                     focusedLabelColor = Color.Blue
                 )
             )
+            Spacer(Modifier.width(4.dp))
 
-            Spacer(modifier = Modifier.width(8.dp))
+            // Voice Button
+            IconButton(
+                onClick = { viewModel.toggleListening() },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = if (voiceState.isListening) Icons.Default.Mic else Icons.Default.MicNone,
+                    contentDescription = "Mic",
+                    tint = if (voiceState.isListening) Color.Red else Color.Blue
+                )
+            }
+
+            Spacer(Modifier.width(4.dp))
 
             Button(
                 onClick = {
                     if (userInput.isNotBlank()) {
-                        viewModel.sendMessage(userInput, mealId = mealId)
-                        userInput = ""
+                        // 1. Send the message
+                        viewModel.sendMessage(userInput, mealId)
+
+                        // 2. Clear the input via the ViewModel (CRITICAL FIX)
+                        viewModel.updateUserInput("")
                     }
                 },
-                modifier = Modifier.wrapContentSize(),
+                enabled = userInput.isNotBlank() && !isLoading,
+                shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
-                enabled = !isLoading,
-                shape = RoundedCornerShape(20.dp)
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Send,
-                    contentDescription = "Send message",
-                    modifier = Modifier.size(18.dp)
-                )
+                Icon(Icons.Default.Send, contentDescription = "Send", modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text("Send")
             }
+
         }
     }
 }
-
 @Composable
 fun ThinkingBubble() {
     Row(

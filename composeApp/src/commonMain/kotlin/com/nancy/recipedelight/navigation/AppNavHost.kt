@@ -14,13 +14,14 @@ import com.nancy.recipedelight.ui.home.HomeScreen
 import com.nancy.recipedelight.ui.home.categories.CategoryScreen
 import com.nancy.recipedelight.ui.home.details.MealDetailsScreen
 import com.nancy.recipedelight.ui.viewmodel.GeminiViewModel
+import com.nancy.recipedelight.voice.VoiceRecognizer
 import org.koin.androidx.compose.get
 
 @Composable
 fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    chatViewModel: GeminiViewModel
+//    chatViewModel: GeminiViewModel
 ) {
     val repository: MealRepository = get()
 
@@ -52,7 +53,7 @@ fun AppNavHost(
 
         //ChefAI screen
         composable(Screen.ChefAI.route){
-            ChefAiScreen(viewModel = chatViewModel)
+            ChefAiScreen()
         }
 
         // Category screen

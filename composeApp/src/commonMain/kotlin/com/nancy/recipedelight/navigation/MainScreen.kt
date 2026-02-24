@@ -1,14 +1,15 @@
 package com.nancy.recipedelight.navigation
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.nancy.recipedelight.ui.viewmodel.GeminiViewModel
+import com.nancy.recipedelight.voice.VoiceRecognizer
 
 @Composable
-fun MainScreen(chatViewModel: GeminiViewModel) {
+fun MainScreen() {
     val navController = rememberNavController()
 
     Scaffold(
@@ -16,8 +17,7 @@ fun MainScreen(chatViewModel: GeminiViewModel) {
     ) { padding ->
         AppNavHost(
             modifier = Modifier.padding(padding),
-            navController  = navController,
-            chatViewModel = chatViewModel
+            navController  = navController
         )
     }
 }
