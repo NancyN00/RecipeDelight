@@ -19,13 +19,11 @@ class AppSettingsRepositoryImpl(
             .map { isDark -> (isDark ?: 0L) != 0L }
 
     override fun toggleDarkMode() {
-        // executeAsOneOrNull shouldn't run on Main Thread
         val current = queries.getDarkMode().executeAsOneOrNull() ?: 0L
         queries.updateDarkMode(if (current == 0L) 1L else 0L)
     }
 
     override fun initDefaults() {
-        // This was the source of the "No such table" crash if called too early
         queries.insertDefaultSettings()
     }
 }

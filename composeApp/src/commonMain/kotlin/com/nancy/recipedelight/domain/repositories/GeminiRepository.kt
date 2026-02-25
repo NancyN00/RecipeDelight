@@ -13,14 +13,14 @@ class GeminiRepository(
     private val api: GeminiApiService,
     private val queries: ChatEntityQueries
 ) {
-    // 1. Fetch History from SQLDelight
+    // Fetch History from SQLDelight
     fun getLocalHistory(mealId: String): List<ChatMessage> {
         return queries.getMessagesByMealId(mealId).executeAsList().map {
             ChatMessage(role = it.role, text = it.message)
         }
     }
 
-    // 2. Process AI logic and save to DB
+    // Process AI logic and save to DB
     suspend fun generateText(
         mealId: String,
         history: List<ChatMessage>,

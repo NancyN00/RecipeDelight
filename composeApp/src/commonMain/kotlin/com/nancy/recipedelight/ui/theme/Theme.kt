@@ -34,7 +34,6 @@ fun RecipeDelightTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    // In M3, we call it 'colorScheme'
     val colorScheme = if (darkTheme) {
         DarkColorScheme
     } else {
@@ -43,7 +42,6 @@ fun RecipeDelightTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        // typography = Typography, // Ensure these are M3 versions if you use them
         content = content
     )
 }

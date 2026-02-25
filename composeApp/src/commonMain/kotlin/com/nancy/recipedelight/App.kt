@@ -7,14 +7,8 @@ import com.nancy.recipedelight.ui.viewmodel.GeminiViewModel
 import com.nancy.recipedelight.voice.VoiceRecognizer
 
 @Composable
-fun App(
-  //  chatViewModel: GeminiViewModel,
-   // voiceRecognizer: VoiceRecognizer
-) {
+fun App() {
     MaterialTheme {
-        MainScreen(
-          //  chatViewModel = chatViewModel,
-          //  voiceRecognizer = voiceRecognizer
-        )
+        MainScreen()
     }
 }

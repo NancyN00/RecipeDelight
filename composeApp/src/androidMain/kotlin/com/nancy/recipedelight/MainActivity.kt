@@ -23,7 +23,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MainActivity : ComponentActivity() {
 
     // Koin injects everything automatically: ApiService -> Queries -> Repo -> ViewModel
-    // private val geminiViewModel: GeminiViewModel by viewModel()
     private val settingsViewModel: SettingsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +35,7 @@ class MainActivity : ComponentActivity() {
             ActivityResultContracts.RequestPermission()
         ) { isGranted ->
             if (!isGranted) {
-                // Handle permission denied (e.g., show a Toast)
+                // Handle permission denied
                 Toast.makeText(this, "Microphone permission is required for Voice AI", Toast.LENGTH_SHORT).show()
             }
         }
@@ -53,14 +52,9 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val isDarkTheme by settingsViewModel.isDarkMode.collectAsState()
-            //     val voiceRecognizer = remember { VoiceRecognizer(context) }
 
             RecipeDelightTheme(darkTheme = isDarkTheme) {
-                // Pass voiceRecognizer here
-                App(
-                    //  chatViewModel = geminiViewModel,
-                    //   voiceRecognizer = voiceRecognizer
-                )
+                App()
             }
 
         }

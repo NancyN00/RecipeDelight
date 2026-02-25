@@ -78,7 +78,6 @@ fun CategoryScreen(
                 // 5. Show Progress Bar
                 CircularProgressIndicator()
             } else {
-                // Your existing Grid
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     modifier = Modifier

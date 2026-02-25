@@ -138,13 +138,14 @@ fun ChefAiScreen(
 
             Spacer(Modifier.width(4.dp))
 
+            //send button
             Button(
                 onClick = {
                     if (userInput.isNotBlank()) {
-                        // 1. Send the message
+                        // Send the message
                         viewModel.sendMessage(userInput, mealId)
 
-                        // 2. Clear the input via the ViewModel (CRITICAL FIX)
+                        // clear the input
                         viewModel.updateUserInput("")
                     }
                 },

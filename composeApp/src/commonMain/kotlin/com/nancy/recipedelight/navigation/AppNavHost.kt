@@ -20,8 +20,7 @@ import org.koin.androidx.compose.get
 @Composable
 fun AppNavHost(
     navController: NavHostController,
-    modifier: Modifier = Modifier,
-//    chatViewModel: GeminiViewModel
+    modifier: Modifier = Modifier
 ) {
     val repository: MealRepository = get()
 
