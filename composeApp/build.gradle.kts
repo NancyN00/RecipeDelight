@@ -47,6 +47,7 @@ kotlin {
                 implementation(libs.ktor.client.okhttp)
                 implementation(libs.koin.android)
                 implementation(libs.koin.androidx.compose)
+                implementation(libs.koin.workmanager)
 
 
                 //sqldelight
@@ -62,6 +63,9 @@ kotlin {
                 implementation(libs.converter.gson)
                 implementation(libs.okhttp)
                 implementation(libs.logging.interceptor)
+
+                //work manager
+                implementation(libs.androidx.work.runtime.ktx)
 
             }
         }

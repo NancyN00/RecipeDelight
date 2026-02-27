@@ -23,6 +23,7 @@ androidx-core-splashscreen = "1.0.1"
 retrofit = "2.9.0"
 okhttp = "4.12.0"
 converterGson = "2.9.0"
+workmanager = "2.11.1"
 
 [libraries]
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
@@ -53,6 +54,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+koin-workmanager = { group = "io.insert-koin", name = "koin-androidx-workmanager", version.ref = "koin"}
 
 # KMP Compose (commonMain)
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
@@ -66,6 +68,9 @@ sqldelight-primitive-adapters = { module = "app.cash.sqldelight:primitive-adapte
 
 #splash
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidx-core-splashscreen" }
+
+# WorkManager Core
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workmanager" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
