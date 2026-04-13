@@ -44,11 +44,11 @@ The project emphasizes **architecture quality over UI complexity**.
 
 | Home | Categories | Details |
 |------|------------|----------|
-| ![homescreen](https://github.com/user-attachments/assets/a4f22133-98da-4f18-82a1-2471536dcdd6) | ![categoriesscreen](https://github.com/user-attachments/assets/0fb9e0ad-262d-462a-8a24-520a1b0387a0) | ![detailsscreen](https://github.com/user-attachments/assets/6c7523a1-cbb0-4f0a-ba3d-1c38e480057d) |
+| <img src="https://github.com/user-attachments/assets/a4f22133-98da-4f18-82a1-2471536dcdd6" width="200"/> | <img src="https://github.com/user-attachments/assets/0fb9e0ad-262d-462a-8a24-520a1b0387a0" width="200"/> | <img src="https://github.com/user-attachments/assets/6c7523a1-cbb0-4f0a-ba3d-1c38e480057d" width="200"/> |
 
-| AI Feature | Bookmarks |
-|------------|-----------|
-| ![aiscreen](https://github.com/user-attachments/assets/6cdb6701-e21e-4388-b2bb-f33bbd2ec04b) | ![bookmarkscreen](https://github.com/user-attachments/assets/6046c472-1b09-4e32-8245-f7a68c88cba3) |
+| Bookmarks | AI |
+|----|----------|
+| <img src="https://github.com/user-attachments/assets/6046c472-1b09-4e32-8245-f7a68c88cba3" width="200"/> | <img src="https://github.com/user-attachments/assets/6cdb6701-e21e-4388-b2bb-f33bbd2ec04b" width="200"/> 
 
 
 ## 🛠 Tech Stack
