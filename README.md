@@ -1,4 +1,4 @@
-# 🍲 Recipe Delight
+![homescreen](https://github.com/user-attachments/assets/7cda2148-8cf6-429b-a7f0-7dade56a6f99)# 🍲 Recipe Delight
 
 > A production-style **Kotlin Multiplatform (KMP)** application demonstrating scalable cross-platform architecture using a shared codebase for Android, Desktop, and Web.
 
@@ -40,12 +40,30 @@ The project emphasizes **architecture quality over UI complexity**.
 
 ---
 
+## 📸 Screenshots
+
+### 🏠 Home Screen
+![homescreen](https://github.com/user-attachments/assets/a4f22133-98da-4f18-82a1-2471536dcdd6)
+
+### 📂 Categories Screen
+![categoriesscreen](https://github.com/user-attachments/assets/0fb9e0ad-262d-462a-8a24-520a1b0387a0)
+
+### 🍲 Details Screen
+![detailsscreen](https://github.com/user-attachments/assets/6c7523a1-cbb0-4f0a-ba3d-1c38e480057d)
+
+### 🤖 AI Screen
+![aiscreen](https://github.com/user-attachments/assets/6cdb6701-e21e-4388-b2bb-f33bbd2ec04b)
+
+### ❤️ Bookmarks Screen
+![bookmarkscreen](https://github.com/user-attachments/assets/6046c472-1b09-4e32-8245-f7a68c88cba3)
+
+
 ## 🛠 Tech Stack
 
 | Concern | Implementation |
 |----------|----------------|
 | Language | Kotlin Multiplatform |
-| UI | Jetpack Compose Multiplatform |
+| UI | Jetpack Compose Multiplatform 
 | DI | Koin |
 | Networking | Ktor Client |
 | Persistence | SQLDelight |
